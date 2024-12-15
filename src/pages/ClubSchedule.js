@@ -8,25 +8,29 @@ import Footer from "../components/footer/Footer.jsx";
 import { EventContext } from '../components/contexts/EventContext';
 import { UserContext } from '../components/contexts/UserContext';
 import EventRegistrationModal from '../components/modals/EventRegistrationModal'; // Import the modal
+import CreateEventModal from '../components/modals/CreateEventModal'
 import "./ClubSchedule.css"
 
 const googleSheetURL = process.env.REACT_APP_API_KEY_CLUB_SCHEDULE;
-const updateUserURL = process.env.REACT_APP_API_KEY_MEMBER_LOGIN;
+// const updateUserURL = process.env.REACT_APP_API_KEY_MEMBER_LOGIN;
 
 const ClubSchedule = () => {
-  const { user, setUser } = useContext(UserContext);
-  const { events, addParticipant, removeParticipant, isFetching, participantFrequency } = useContext(EventContext);
+  const { user } = useContext(UserContext);
+  const { events, addEvent, deleteEvent, addParticipant, removeParticipant, isFetching, participantFrequency } = useContext(EventContext);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [isCreateEventModalOpen, setCreateEventModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  // const [newEvent, setNewEvent] = useState({ title: '', start: '', end: '' });
   const [screenWidth, setScreenWidth] = useState(window.innerWidth); // Track screen width
 
   const eventTypeColors = {
     0: '#3357FF', // Color for type 2
-    1: '#FF5733', // Color for type 0
-    2: '#33FF57', // Color for type 1
-    3: '#FF33A1'  // Color for type 3
-  };
+    1: '#5A189A', // Color for type 1
+    2: '#065535', // Color for type 0
+    3: '#D72638', // Color for type 3
 
+  };
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
@@ -35,80 +39,47 @@ const ClubSchedule = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+
   const handleEventClick = (info) => {
-    const clickedEvent = events.find(event => event.id === info.event.id);
+    const clickedEvent = events.find(event => event.id == info.event.id);
+    console.log(events)
+    console.log(info.event.id)
     setSelectedEvent(clickedEvent);
     setModalIsOpen(true);
   };
 
-  // const handleUserBooking = async (action) =>{
-  //   let actBooking = 0;
-  //   if (action === "add"){
-  //     actBooking = -1
-  //   } else if(action ==='remove'){
-  //     actBooking = 1
-  //   }
-  //   try{
-  //     const response = await fetch(updateUserURL, {
-  //       // redirect: "follow",
-  //       method: 'POST',
-  //       // headers: {
-  //       //   "Content-Type": "text/plain;charset=utf-8",
-  //       // },
-  //       body: JSON.stringify({
-  //         email: user.email,
-  //         phone: user.phone,
-  //         booking: user.booking + actBooking+"",
-  //         action: "update"
-  //       }),
-  //     });
-  //     if (response.status === 200) {
-  //       let updatedUser = {...user,booking:user.booking + actBooking}
-  //       setUser(updatedUser)
+  const handleDateClick = (info) => {
+    if (user?.isAdmin) {
+      // console.log(info);
+      setSelectedDate(info.dateStr);
+      setCreateEventModalOpen(true);
+    } else {
+      alert("Only admins can create events.");
+    }
+  };
 
-  //       return { success: true };
-  //     }
-
-  //   }catch{
-  //     return { success: false, message: 'Error! Possibly server limit reached. Try again tomorrow.' };
-  //   }
-  // }
-
-  const handleParticipate = async () => {    
-    if (selectedEvent.number_of_participants < selectedEvent.maxParticipants) {     
-      
+  const handleParticipate = async () => {
+    if (selectedEvent.number_of_participants < selectedEvent.maxParticipants) {
       try {
         const response = await fetch(googleSheetURL, {
-          // redirect: "follow",
           method: 'POST',
-          // headers: {
-          //   "Content-Type": "text/plain;charset=utf-8",
-          // },
           body: JSON.stringify({
+            action: "addParticipants",
             eventId: selectedEvent.id,
             participantName: user.name,
             eventDate: selectedEvent.start.split('T')[0],
-            action: "add"
           }),
-
         });
-        // console.log(response);
 
         if (response.status === 200) {
-          // handleUserBooking("add");
-          const updatedParticipants = selectedEvent.participants + ', ' + user.name;
-
+          const updatedParticipants = `${selectedEvent.participants}, ${user.name}`;
           const updatedEvent = {
             ...selectedEvent,
             participants: updatedParticipants,
             number_of_participants: selectedEvent.number_of_participants + 1,
           };
-
-          //TODO fix this repeating code
           setSelectedEvent(updatedEvent);
           addParticipant(selectedEvent.id, user.name);
-
-          // setSuccess(true);
           return { success: true };
         } else {
           return { success: false, message: `Error: ${response.statusText}` };
@@ -122,36 +93,27 @@ const ClubSchedule = () => {
     }
   };
 
-
   const handleCancelParticipation = async () => {
     try {
       const response = await fetch(googleSheetURL, {
-        // redirect: "follow",
         method: 'POST',
-        // headers: {
-        //   "Content-Type": "text/plain;charset=utf-8",
-        // },
         body: JSON.stringify({
+          action: "deleteParticipants",
           eventId: selectedEvent.id,
           participantName: user.name,
           eventDate: selectedEvent.start.split('T')[0],
-          action: "remove"
         }),
       });
 
       if (response.status === 200) {
-        // handleUserBooking("remove");
-        let participantsArray = selectedEvent.participants.split(', ');
-        let updatedParticipants = participantsArray.filter(name => name !== user.name).join(', ')
-
+        const participantsArray = selectedEvent.participants.split(', ');
+        const updatedParticipants = participantsArray.filter(name => name !== user.name).join(', ');
 
         const updatedEvent = {
           ...selectedEvent,
           participants: updatedParticipants,
           number_of_participants: selectedEvent.number_of_participants - 1,
         };
-
-        //TODO remove repeating code
         setSelectedEvent(updatedEvent);
         removeParticipant(selectedEvent.id, user.name);
 
@@ -164,38 +126,89 @@ const ClubSchedule = () => {
       return { success: false, message: 'Error! Please try again later.' };
     }
   };
+  
+  const handleAddEvent = async (newEvent) => {
+
+    try {
+      const response = await fetch(googleSheetURL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: "addEvent",
+          ...newEvent
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Error adding event:', response.statusText);
+        return { success: false, message: `Error: ${response.statusText}` };
+      }
+  
+      const result = await response.json();
+  
+      if (result.status === "success") {
+    
+        addEvent(newEvent); // Update the context
+        setCreateEventModalOpen(false);
+  
+        return { success: true, message: "Event added successfully" };
+      } else {
+        console.error("Error adding event:", result.message);
+        return { success: false, message: result.message };
+      }
+    } catch (error) {
+      console.error('Error adding event:', error);
+      return { success: false, message: "An error occurred while adding the event." };
+    }
+  };
 
   const handleUpdateEvent = async (updatedEvent) => {
     try {
       const response = await fetch(googleSheetURL, {
-        redirect: "follow",
         method: 'POST',
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8",
-        },
         body: JSON.stringify({
+          action: "editEvent",
           eventId: selectedEvent.id,
+          title: updatedEvent.title,
           participantName: selectedEvent.participantName,
           eventDate: selectedEvent.start.split('T')[0],
           ...updatedEvent,
-          action: "edit"
+          notes: updatedEvent.notes,
+          maxParticipants: updatedEvent.maxParticipants,
         }),
-
       });
-      if (response.status === 200) {
-        setSelectedEvent(updatedEvent);        
-        return { success: true };
 
+      if (response.status === 200) {
+        setSelectedEvent(updatedEvent);
+        return { success: true };
       } else {
         return { success: false, message: `Error: ${response.statusText}` };
       }
     } catch (error) {
-      console.error("Error canceling participation:", error);
+      console.error("Error updating event:", error);
       return { success: false, message: 'Error! Please try again later.' };
     }
   };
 
+  const handleDeleteEvent = async (eventId) => {
+    try {
+      const response = await fetch(googleSheetURL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: "deleteEvent",
+          eventId,
+        }),
+      });
 
+      if (response.status === 200) {
+        deleteEvent(eventId); // Update the context
+        setModalIsOpen(false);
+      } else {
+        console.error('Error deleting event:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+    }
+  };
 
   function renderEventContent(eventInfo) {
     const textClass = screenWidth < 768 ? 'event-text-mobile' : 'event-text-desktop';
@@ -209,16 +222,17 @@ const ClubSchedule = () => {
     );
   }
 
-
   return (
     <div className="app-container">
       <Header />
       <div className="home-container">
         <div className="content-container">
           <div className="single-content-container">
-            {isFetching ? (<h2 style={{ color: 'blue',textAlign: 'center' }}>
-              Loading Events...
-            </h2>) : <h2>Club Schedule</h2>}
+            {isFetching ? (
+              <h2 style={{ color: 'blue', textAlign: 'center' }}>Loading Events...</h2>
+            ) : (
+              <h2>Club Schedule</h2>
+            )}
             <FullCalendar
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
               initialView="timeGridWeek"
@@ -238,28 +252,41 @@ const ClubSchedule = () => {
               headerToolbar={{
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                right: 'dayGridMonth,timeGridWeek,timeGridDay',
               }}
-              height={screenWidth < 768 ? 600 : 'auto'} // Adjust height for mobile
+              height={screenWidth < 768 ? 600 : 'auto'}
               eventClick={handleEventClick}
+              dateClick={handleDateClick}
               editable={true}
               selectable={true}
               slotMinTime="09:00:00"
               slotMaxTime="24:00:00"
               eventContent={renderEventContent}
-              eventOverlap={true} // Allow events to overlap
+              eventOverlap={true}
               slotEventOverlap={false}
             />
-            {selectedEvent && <EventRegistrationModal
-              show={modalIsOpen}
-              handleClose={() => setModalIsOpen(false)}
-              selectedEvent={selectedEvent}
-              handleParticipate={handleParticipate}
-              handleCancelParticipation={handleCancelParticipation}
-              handleUpdateEvent={handleUpdateEvent}
-              user={user}
-              participantFrequency= {participantFrequency}
-            />}
+            {selectedEvent && (
+              <EventRegistrationModal
+                show={modalIsOpen}
+                handleClose={() => setModalIsOpen(false)}
+                selectedEvent={selectedEvent}
+                handleParticipate={handleParticipate}
+                handleCancelParticipation={handleCancelParticipation}
+                handleDeleteEvent={handleDeleteEvent}
+                handleUpdateEvent={handleUpdateEvent}
+                user={user}
+                participantFrequency= {participantFrequency}
+              />
+            )}
+            {isCreateEventModalOpen && (
+              <CreateEventModal
+                show={isCreateEventModalOpen}
+                handleClose={() => setCreateEventModalOpen(false)}
+                handleAddEvent={handleAddEvent}
+                selectedDate={selectedDate}
+
+              />
+            )}
           </div>
         </div>
       </div>

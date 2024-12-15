@@ -21,8 +21,13 @@ const About = () => {
             </p><p>
               Tryouts are held at the beginning of each term to ensuring a great experience for all.
             </p>
+
+
+            <h2>Connect With Us</h2>
+
+            
             <p>
-              For more information, contact us at <a href="mailto:umtennis@gmail.com">umtennis@gmail.com</a>.
+              For more information, contact us at <a href="mailto:umtennis@gmail.com">umtennis@gmail.com</a>.              
             </p>
 
             <h2>Executive Members 2024</h2>
