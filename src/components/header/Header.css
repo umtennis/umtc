@@ -1,10 +1,53 @@
-/* .app-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.navbar-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: top;
-  font-size: calc(10px + 2vmin);
-  color: white;
-} */
+  justify-content: space-between; /* Space between left and right sections */
+  align-items: center; /* Center items vertically */
+  width: 100%;
+}
+
+/* Left navigation */
+.nav-left {
+  display: flex;
+  gap: 20px; /* Space between left navigation links */
+}
+
+/* Right navigation */
+.nav-right {
+  display: flex;
+  gap: 15px; /* Space between right navigation buttons */
+  align-items: center; /* Align buttons with the logo */
+}
+
+/* WhatsApp logo adjustments */
+.whatsapp-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  margin: 0; /* Remove extra margin */
+  display: block; /* Prevent inline elements from adding extra space */
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  .nav-left,
+  .nav-right {
+    flex: 1; /* Ensure both columns take equal width */
+    flex-direction: column; /* Align items vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+  }
+}
+
+@media (min-width: 1200px) {
+  .navbar-container {
+    flex-direction: row; /* Split into left and right sections */
+  }
+
+  .nav-left {
+    justify-content: flex-start; /* Push to the far left */
+  }
+
+  .nav-right {
+    justify-content: flex-end; /* Push to the far right */
+  }
+}

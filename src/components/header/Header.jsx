@@ -5,9 +5,17 @@ import { UserContext } from "../contexts/UserContext";
 import LoginModal from "./LoginModal";
 import SignUpModal from "./SignupModal";
 import ManageAccountModal from "./ManageAccountModal"; // Import the ManageAccountModal component
+import "./Header.css";
 
 import whatsappLogo from "../../assets/whatsapp/whatsapp_logo.png"; // Import WhatsApp logo
 import whatsappQR from "../../assets/whatsapp/whatsapp_2024.png"; // Import WhatsApp QR code
+
+const linkStyle = {
+  //   // color: "white",
+  //   // margin: "3px",
+  cursor: "pointer",
+  padding: 0,
+};
 
 function Header() {
   let navigate = useNavigate();
@@ -63,48 +71,60 @@ function Header() {
 
   return (
     <>
-      <Navbar bg="dark" variant="dark" expand="lg">
-        <Container>
-          <Navbar.Brand as={Link} to="/home">
-            University of Manitoba Tennis Club
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link as={Link} to="/home">
-                Home
-              </Nav.Link>
-              <Nav.Link as={Link} to="/schedule">
-                Club Schedule
-              </Nav.Link>
-              <Nav.Link as={Link} to="/programs">
-                Programs
-              </Nav.Link>
-              <Nav.Link as={Link} to="/socials">
-                Socials
-              </Nav.Link>
-              <Nav.Link as={Link} to="/about">
-                About Us
-              </Nav.Link>
-            </Nav>
-            <Nav
-              className="ms-auto"
-              style={{ display: "flex", alignItems: "center" }}
-            >
-              {userLogin(
-                isLoggedIn,
-                user,
-                navigate,
-                logout,
-                handleShowLogin,
-                handleShowSignup,
-                handleShowManageAccount,
-                handleShowWhatsApp
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+ <Navbar bg="dark" variant="dark" expand="lg">
+  <Container>
+    <Navbar.Brand as={Link} to="/home">
+      University of Manitoba Tennis Club
+    </Navbar.Brand>
+    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+    <Navbar.Collapse id="basic-navbar-nav">
+      <div className="navbar-container">
+        {/* Left Column */}
+        <Nav className="nav-left">
+          <Nav.Link as={Link} to="/home">
+            Home
+          </Nav.Link>
+          <Nav.Link as={Link} to="/schedule">
+            Club Schedule
+          </Nav.Link>
+          <Nav.Link as={Link} to="/programs">
+            Programs
+          </Nav.Link>
+          <Nav.Link as={Link} to="/socials">
+            Socials
+          </Nav.Link>
+          <Nav.Link as={Link} to="/about">
+            About Us
+          </Nav.Link>
+        </Nav>
+
+        {/* Right Column */}
+        <Nav className="nav-right">
+          <Nav.Link onClick={handleShowWhatsApp} style={linkStyle}>
+            <img
+              src={whatsappLogo}
+              alt="WhatsApp Group"
+              className="whatsapp-logo"
+            />
+          </Nav.Link>
+          <Nav.Link onClick={handleShowManageAccount} style={linkStyle}>
+            Manage Account
+          </Nav.Link>
+          <Nav.Link
+            onClick={() => {
+              logout();
+              navigate("/home");
+            }}
+            style={linkStyle}
+          >
+            Logout
+          </Nav.Link>
+        </Nav>
+      </div>
+    </Navbar.Collapse>
+  </Container>
+</Navbar>
+
 
       {/* Login Modal */}
       <LoginModal show={showLoginModal} handleClose={handleCloseLogin} />
@@ -130,8 +150,8 @@ function Header() {
         </Modal.Header>
         <Modal.Body style={{ textAlign: "center" }}>
           <p>
-            Stay connected and receive the latest updates by joining our
-            members group chat on WhatsApp!
+            Stay connected and receive the latest updates by joining our members
+            group chat on WhatsApp!
           </p>
           <div style={{ marginTop: "20px" }}>
             <img
@@ -166,7 +186,6 @@ function Header() {
     </>
   );
 }
-
 function userLogin(
   isLoggedIn,
   user,
@@ -177,27 +196,16 @@ function userLogin(
   handleShowManageAccount,
   handleShowWhatsApp
 ) {
-  const linkStyle = {
-    color: "white",
-    margin: "3px",
-    cursor: "pointer",
-  };
-
   if (isLoggedIn) {
     return (
       <>
-        <Nav.Link
-          onClick={handleShowWhatsApp}
-          style={{ cursor: "pointer", padding: 0 }}
-        >
+        <Nav.Link onClick={handleShowWhatsApp} style={linkStyle}>
           <img
             src={whatsappLogo}
             alt="WhatsApp Group"
             style={{
               width: "40px",
               height: "40px",
-              marginRight: "10px",
-              display: "block", // Removes bottom padding caused by inline display
               objectFit: "contain",
             }}
           />
