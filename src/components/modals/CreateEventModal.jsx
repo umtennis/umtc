@@ -19,7 +19,7 @@ const CreateEventModal = ({
 
 
   const onCreateEvent = async () => {
-    if (!title || !duration || !maxParticipants) {
+    if (!title || !description || !duration || !maxParticipants) {
       setError("Please fill in all fields.");
       return;
     }
@@ -75,7 +75,7 @@ const CreateEventModal = ({
               as="textarea"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add any description (optional)"
+              placeholder="Add any description (location/court/etc)"
             />
           </Form.Group>
           <Form.Group controlId="eventNotes" className="mt-3">

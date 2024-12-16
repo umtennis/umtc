@@ -54,7 +54,7 @@ const ClubSchedule = () => {
       setSelectedDate(info.dateStr);
       setCreateEventModalOpen(true);
     } else {
-      alert("Only admins can create events.");
+      // alert("Only admins can create events.");
     }
   };
 
