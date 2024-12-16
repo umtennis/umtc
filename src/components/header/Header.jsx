@@ -71,60 +71,50 @@ function Header() {
 
   return (
     <>
- <Navbar bg="dark" variant="dark" expand="lg">
-  <Container>
-    <Navbar.Brand as={Link} to="/home">
-      University of Manitoba Tennis Club
-    </Navbar.Brand>
-    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-    <Navbar.Collapse id="basic-navbar-nav">
-      <div className="navbar-container">
-        {/* Left Column */}
-        <Nav className="nav-left">
-          <Nav.Link as={Link} to="/home">
-            Home
-          </Nav.Link>
-          <Nav.Link as={Link} to="/schedule">
-            Club Schedule
-          </Nav.Link>
-          <Nav.Link as={Link} to="/programs">
-            Programs
-          </Nav.Link>
-          <Nav.Link as={Link} to="/socials">
-            Socials
-          </Nav.Link>
-          <Nav.Link as={Link} to="/about">
-            About Us
-          </Nav.Link>
-        </Nav>
+      <Navbar bg="dark" variant="dark" expand="lg">
+        <Container>
+          <Navbar.Brand as={Link} to="/home">
+            University of Manitoba Tennis Club
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <div className="navbar-container">
+              {/* Left Column */}
+              <Nav className="nav-left">
+                <Nav.Link as={Link} to="/home">
+                  Home
+                </Nav.Link>
+                <Nav.Link as={Link} to="/schedule">
+                  Club Schedule
+                </Nav.Link>
+                <Nav.Link as={Link} to="/programs">
+                  Programs
+                </Nav.Link>
+                <Nav.Link as={Link} to="/socials">
+                  Socials
+                </Nav.Link>
+                <Nav.Link as={Link} to="/about">
+                  About Us
+                </Nav.Link>
+              </Nav>
 
-        {/* Right Column */}
-        <Nav className="nav-right">
-          <Nav.Link onClick={handleShowWhatsApp} style={linkStyle}>
-            <img
-              src={whatsappLogo}
-              alt="WhatsApp Group"
-              className="whatsapp-logo"
-            />
-          </Nav.Link>
-          <Nav.Link onClick={handleShowManageAccount} style={linkStyle}>
-            Manage Account
-          </Nav.Link>
-          <Nav.Link
-            onClick={() => {
-              logout();
-              navigate("/home");
-            }}
-            style={linkStyle}
-          >
-            Logout
-          </Nav.Link>
-        </Nav>
-      </div>
-    </Navbar.Collapse>
-  </Container>
-</Navbar>
-
+              {/* Right Column */}
+              <Nav className="nav-right">
+                {userLogin(
+                  isLoggedIn,
+                  user,
+                  navigate,
+                  logout,
+                  handleShowLogin,
+                  handleShowSignup,
+                  handleShowManageAccount,
+                  handleShowWhatsApp
+                )}
+              </Nav>
+            </div>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
 
       {/* Login Modal */}
       <LoginModal show={showLoginModal} handleClose={handleCloseLogin} />
