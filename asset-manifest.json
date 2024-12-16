@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.248fc27d.css",
-    "main.js": "/static/js/main.1084476b.js",
+    "main.css": "/static/css/main.2a9e0a90.css",
+    "main.js": "/static/js/main.9d796d66.js",
     "static/js/453.5f5be0c6.chunk.js": "/static/js/453.5f5be0c6.chunk.js",
     "static/media/home_background.jpg": "/static/media/home_background.4069eb1074f3b79e299c.jpg",
     "static/media/general_members_2023.JPG": "/static/media/general_members_2023.c2841833ec8b555aad5a.JPG",
@@ -21,13 +21,19 @@
     "static/media/7.jpg": "/static/media/7.977f86c24879aa0bc02d.jpg",
     "static/media/4.jpg": "/static/media/4.acedb373e36e9cde9b2c.jpg",
     "static/media/6.jpg": "/static/media/6.f69732f7870948725d44.jpg",
+    "static/media/whatsapp_logo.png": "/static/media/whatsapp_logo.e0299b92a258deb34171.png",
+    "static/media/TennisManitoba.png": "/static/media/TennisManitoba.ad7af3216f00953319d9.png",
+    "static/media/Tennis_Canada.png": "/static/media/Tennis_Canada.574f4f0709a9415e2d88.png",
+    "static/media/whatsapp_2024.png": "/static/media/whatsapp_2024.7cdd81086864d7e3704b.png",
+    "static/media/UofMRecServices.png": "/static/media/UofMRecServices.30bbe7aebe04220e961d.png",
+    "static/media/tennisgiant.png": "/static/media/tennisgiant.99a2575049df341aef3f.png",
     "index.html": "/index.html",
-    "main.248fc27d.css.map": "/static/css/main.248fc27d.css.map",
-    "main.1084476b.js.map": "/static/js/main.1084476b.js.map",
+    "main.2a9e0a90.css.map": "/static/css/main.2a9e0a90.css.map",
+    "main.9d796d66.js.map": "/static/js/main.9d796d66.js.map",
     "453.5f5be0c6.chunk.js.map": "/static/js/453.5f5be0c6.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.248fc27d.css",
-    "static/js/main.1084476b.js"
+    "static/css/main.2a9e0a90.css",
+    "static/js/main.9d796d66.js"
   ]
 }
