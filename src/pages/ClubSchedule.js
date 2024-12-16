@@ -16,7 +16,7 @@ const googleSheetURL = process.env.REACT_APP_API_KEY_CLUB_SCHEDULE;
 
 const ClubSchedule = () => {
   const { user } = useContext(UserContext);
-  const { events, addEvent, deleteEvent, addParticipant, removeParticipant, isFetching, participantFrequency } = useContext(EventContext);
+  const { events, addEvent, refreshEvents, addParticipant, removeParticipant, isFetching, participantFrequency } = useContext(EventContext);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isCreateEventModalOpen, setCreateEventModalOpen] = useState(false);
@@ -41,9 +41,9 @@ const ClubSchedule = () => {
 
 
   const handleEventClick = (info) => {
-    const clickedEvent = events.find(event => event.id == info.event.id);
-    console.log(events)
-    console.log(info.event.id)
+
+    const clickedEvent = events.find(event => event.eventId == info.event.id);
+    // console.log(clickedEvent);
     setSelectedEvent(clickedEvent);
     setModalIsOpen(true);
   };
@@ -65,7 +65,7 @@ const ClubSchedule = () => {
           method: 'POST',
           body: JSON.stringify({
             action: "addParticipants",
-            eventId: selectedEvent.id,
+            eventId: selectedEvent.eventId,
             participantName: user.name,
             eventDate: selectedEvent.start.split('T')[0],
           }),
@@ -79,7 +79,7 @@ const ClubSchedule = () => {
             number_of_participants: selectedEvent.number_of_participants + 1,
           };
           setSelectedEvent(updatedEvent);
-          addParticipant(selectedEvent.id, user.name);
+          addParticipant(selectedEvent.eventId, user.name);
           return { success: true };
         } else {
           return { success: false, message: `Error: ${response.statusText}` };
@@ -99,7 +99,7 @@ const ClubSchedule = () => {
         method: 'POST',
         body: JSON.stringify({
           action: "deleteParticipants",
-          eventId: selectedEvent.id,
+          eventId: selectedEvent.eventId,
           participantName: user.name,
           eventDate: selectedEvent.start.split('T')[0],
         }),
@@ -115,7 +115,7 @@ const ClubSchedule = () => {
           number_of_participants: selectedEvent.number_of_participants - 1,
         };
         setSelectedEvent(updatedEvent);
-        removeParticipant(selectedEvent.id, user.name);
+        removeParticipant(selectedEvent.eventId, user.name);
 
         return { success: true };
       } else {
@@ -167,18 +167,16 @@ const ClubSchedule = () => {
         method: 'POST',
         body: JSON.stringify({
           action: "editEvent",
-          eventId: selectedEvent.id,
-          title: updatedEvent.title,
-          participantName: selectedEvent.participantName,
-          eventDate: selectedEvent.start.split('T')[0],
+
+          // participantName: selectedEvent.participantName,
+          // eventDate: selectedEvent.eventDate,
           ...updatedEvent,
-          notes: updatedEvent.notes,
-          maxParticipants: updatedEvent.maxParticipants,
         }),
       });
 
       if (response.status === 200) {
         setSelectedEvent(updatedEvent);
+        refreshEvents();
         return { success: true };
       } else {
         return { success: false, message: `Error: ${response.statusText}` };
@@ -189,25 +187,31 @@ const ClubSchedule = () => {
     }
   };
 
-  const handleDeleteEvent = async (eventId) => {
+  const handleDeleteEvent = async () => {
+
+    // console.log(selectedEvent.eventId);
+    let status = false
     try {
       const response = await fetch(googleSheetURL, {
         method: 'POST',
         body: JSON.stringify({
           action: "deleteEvent",
-          eventId,
+          ...selectedEvent,
         }),
       });
 
       if (response.status === 200) {
-        deleteEvent(eventId); // Update the context
-        setModalIsOpen(false);
+        refreshEvents(); // Update the context
+        // setModalIsOpen(false);
+        status = true;
+        return status
       } else {
         console.error('Error deleting event:', response.statusText);
       }
     } catch (error) {
       console.error('Error deleting event:', error);
     }
+    return status
   };
 
   function renderEventContent(eventInfo) {
@@ -239,7 +243,7 @@ const ClubSchedule = () => {
               events={events.map(event => {
                 const isFull = event.number_of_participants >= event.maxParticipants;
                 return {
-                  id: event.id,
+                  id: event.eventId,
                   title: `${event.title}`,
                   start: event.start,
                   end: event.end,

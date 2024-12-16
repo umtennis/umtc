@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { use } from 'react';
+
 
 // Create a context
 export const EventContext = createContext();
@@ -15,11 +15,11 @@ export const EventProvider = ({ children }) => {
     try {
       const response = await fetch(process.env.REACT_APP_API_KEY_CLUB_SCHEDULE);
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       const mappedEvents = data.events
         .filter(event => event.id) // Ignore entries without an id
         .map(event => ({
-          id: event.id,
+          eventId: event.id,
           title: event.title,
           description: event.description,
           type: event.type,
@@ -28,11 +28,14 @@ export const EventProvider = ({ children }) => {
           participants: event.participants || [],
           number_of_participants: event.number_of_participants || 0,
           notes: event.notes || '',
-          maxParticipants: event.maxParticipants
+          maxParticipants: event.maxParticipants,
+          eventDate: event.date
         }));
 
  
       setEvents(mappedEvents);
+
+      console.log("fetching: ",mappedEvents)
       initializeParticipantFrequency(mappedEvents); // Initialize participant frequency after fetching
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -75,25 +78,8 @@ export const EventProvider = ({ children }) => {
     await fetchEvents();
   };
 
-  // Function to delete an event by its ID
-  const deleteEvent = async (eventId) => {
-    // setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
-
-    // // Adjust participant frequencies for the deleted event
-    // const deletedEvent = events.find(event => event.id === eventId);
-    // if (deletedEvent) {
-    //   let participants = deletedEvent.participants;
-
-    //   if (typeof participants === 'string') {
-    //     participants = participants.split(',').map(p => p.trim());
-    //   }
-
-    //   if (Array.isArray(participants)) {
-    //     participants.forEach(participant => {
-    //       decrementParticipantFrequency(participant);
-    //     });
-    //   }
-    // }
+  // Function to refresh events
+  const refreshEvents = async () => {
     await fetchEvents();
   };
 
@@ -122,7 +108,7 @@ export const EventProvider = ({ children }) => {
 
   const addParticipant = (eventId, participantName) => {
     const updatedEvents = events.map(event => {
-      if (event.id === eventId) {
+      if (event.eventId === eventId) {
         let updatedParticipants;
 
         if (typeof event.participants === 'string') {
@@ -134,7 +120,6 @@ export const EventProvider = ({ children }) => {
         } else {
           updatedParticipants = participantName;
         }
-
         // Increment the frequency of the participant
         incrementParticipantFrequency(participantName);
 
@@ -144,13 +129,14 @@ export const EventProvider = ({ children }) => {
           participants: updatedParticipants
         };
       }
+      return event
     });
     setEvents(updatedEvents);
   };
 
   const removeParticipant = (eventId, participantName) => {
     const updatedEvents = events.map(event => {
-      if (event.id === eventId) {
+      if (event.eventId === eventId) {
         let updatedParticipants;
 
         if (typeof event.participants === 'string') {
@@ -178,7 +164,7 @@ export const EventProvider = ({ children }) => {
   };
 
   return (
-    <EventContext.Provider value={{ events, addParticipant, removeParticipant, fetchEvents, participantFrequency, isFetching, addEvent, deleteEvent }}>
+    <EventContext.Provider value={{ events, addParticipant, removeParticipant, fetchEvents, participantFrequency, isFetching, addEvent, refreshEvents }}>
       {children}
     </EventContext.Provider>
   );

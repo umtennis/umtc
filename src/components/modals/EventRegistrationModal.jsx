@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Alert, Form } from "react-bootstrap";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
@@ -17,7 +17,7 @@ const EventRegistrationModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editedTitle, setEditedTitle] = useState(selectedEvent.title);
@@ -29,6 +29,16 @@ const EventRegistrationModal = ({
   const [editedMaxParticipants, setEditedMaxParticipants] = useState(
     selectedEvent.maxParticipants
   );
+
+  useEffect(() => {
+    if (selectedEvent) {
+      setEditedTitle(selectedEvent.title || "");
+      setEditedType(selectedEvent.type || 0);
+      setEditedDescription(selectedEvent.description || "");
+      setEditedNotes(selectedEvent.notes || "");
+      setEditedMaxParticipants(selectedEvent.maxParticipants || 0);
+    }
+  }, [selectedEvent]);
 
   // Normalize participants to an array
   const participants = Array.isArray(selectedEvent?.participants)
@@ -104,9 +114,30 @@ const EventRegistrationModal = ({
   };
 
   const onDeleteClick = async () => {
-    await handleDeleteEvent(selectedEvent.id);
-  }
-  
+    if (!window.confirm("Are you sure you want to delete this event?")) {
+      return;
+    }
+    setIsDeleting(true); // Set delete button to "Sending..." state
+
+    try {
+      const response = await handleDeleteEvent();
+      if (response) {
+        setShowSuccessMessage(true);
+        // Optionally add a timeout for showing success message
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+          handleClose(); // Close the modal after successful delete
+        }, 2000);
+      } else {
+        setError("Delete failed. Please try again.");
+      }
+    } catch (err) {
+      setError("An error occurred during deletion.");
+    } finally {
+      setIsDeleting(false); // Reset the delete button state
+    }
+  };
+
   const onEditSave = async () => {
     setIsSaving(true);
 
@@ -116,7 +147,7 @@ const EventRegistrationModal = ({
       description: editedDescription,
       notes: editedNotes,
       maxParticipants: editedMaxParticipants,
-      type: editedType
+      type: editedType,
     };
 
     try {
@@ -211,21 +242,26 @@ const EventRegistrationModal = ({
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: true,
-              })}              
+              })}
             </p>
             <p>{selectedEvent.notes && <>Notes: {selectedEvent.notes}</>}</p>
             <p>
               Spots Available:{" "}
               {selectedEvent.maxParticipants -
-                selectedEvent.number_of_participants}
+                selectedEvent.number_of_participants}{" "}
+              (Max. {selectedEvent.maxParticipants})
             </p>
           </>
         )}
-        <ul>
-          {participants.map((participant, index) => (
-            <li key={index}>{participant}</li>
-          ))}
-        </ul>
+
+        {!isEditing && (
+          <ul>
+            {participants.map((participant, index) => (
+              <li key={index}>{participant}</li>
+            ))}
+          </ul>
+        )}
+
         {showSuccessMessage ? (
           <Alert variant="success">Success!</Alert>
         ) : (
@@ -247,16 +283,19 @@ const EventRegistrationModal = ({
               )
             ) : (
               <>
-              
-              <Button variant="primary" onClick={onEditClick}>
-                Edit
-              </Button>
-              <> </>
-              
-              <Button variant="danger" onClick={onDeleteClick}>
-                Delete
-              </Button>
-              
+                <Button variant="primary" onClick={onEditClick}>
+                  Edit
+                </Button>
+                <> </>
+                {isDeleting ? (
+                  <Button variant="danger" disabled>
+                    Sending...
+                  </Button>
+                ) : (
+                  <Button variant="danger" onClick={onDeleteClick}>
+                    Delete
+                  </Button>
+                )}
               </>
             )}
           </div>
@@ -286,8 +325,6 @@ const EventRegistrationModal = ({
                     className="me-2"
                   >
                     {loading ? "Registering..." : "Register"}
-
-                    {/* TODO REMOVE, FUNCTION NOT USED  */}
                   </Button>
                 ) : (
                   <OverlayTrigger

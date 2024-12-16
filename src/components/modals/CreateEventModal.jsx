@@ -15,12 +15,16 @@ const CreateEventModal = ({
   const [duration, setDuration] = useState(1); // Default to 1 hour
   const [type, setType] = useState(0); // Default to 0
   const [error, setError] = useState("");
+  const [isCreating, setIsCreating] = useState(false); // State for "Sending..." status
+
 
   const onCreateEvent = async () => {
     if (!title || !duration || !maxParticipants) {
       setError("Please fill in all fields.");
       return;
     }
+
+    setIsCreating(true); // Set the button to "Sending..." state
     
     const startTime = new Date(selectedDate);
     const endTime = new Date(startTime);
@@ -65,7 +69,7 @@ const CreateEventModal = ({
               placeholder="Enter event title"
             />
           </Form.Group>
-          <Form.Group controlId="eventNotes" className="mt-3">
+          <Form.Group controlId="eventDescription" className="mt-3">
             <Form.Label>Description</Form.Label>
             <Form.Control
               as="textarea"
@@ -107,26 +111,30 @@ const CreateEventModal = ({
             </Form.Control>
           </Form.Group>
           <Form.Group controlId="eventType" className="mt-3">
-              <Form.Label>Event Type</Form.Label>
-              <Form.Control
-                as="select"
-                value={type}
-                onChange={(e) => setType(Number(e.target.value))}
-              >
-                <option value="0">Club Regular Sessions</option>
-                <option value="1">Social Events</option>
-                <option value="2">Competitive Events</option>
-                <option value="3">All other special Events</option>
-              </Form.Control>
-            </Form.Group>
+            <Form.Label>Event Type</Form.Label>
+            <Form.Control
+              as="select"
+              value={type}
+              onChange={(e) => setType(Number(e.target.value))}
+            >
+              <option value="0">Club Regular Sessions</option>
+              <option value="1">Social Events</option>
+              <option value="2">Competitive Events</option>
+              <option value="3">All other special Events</option>
+            </Form.Control>
+          </Form.Group>
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button variant="secondary" onClick={handleClose} disabled={isCreating}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={onCreateEvent}>
-          Create Event
+        <Button
+          variant="primary"
+          onClick={onCreateEvent}
+          disabled={isCreating} // Disable the button while creating
+        >
+          {isCreating ? "Sending..." : "Create Event"} {/* Show "Sending..." */}
         </Button>
       </Modal.Footer>
     </Modal>
