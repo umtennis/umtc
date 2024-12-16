@@ -1,8 +1,9 @@
-import React, { useContext, useState,useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { Spinner } from 'react-bootstrap';
 import Header from "../components/header/Header.jsx";
 import Footer from "../components/footer/Footer.jsx";
 import { EventContext } from '../components/contexts/EventContext';
@@ -39,6 +40,26 @@ const ClubSchedule = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  function renderEventContent(eventInfo) {
+    const textClass = screenWidth < 768 ? 'event-text-mobile' : 'event-text-desktop';
+    return (
+      <div>
+        <b className={`fc-event-time ${textClass}`}>{eventInfo.timeText}</b>
+        <div className={`fc-event-title ${textClass}`}>
+          {eventInfo.event.title}
+        </div>
+      </div>
+    );
+  }
+
+  const renderLoadingIndicator = () => (
+    <div className="loading-container" style={{ textAlign: 'center', padding: '50px 0' }}>
+      <Spinner animation="border" role="status" style={{ width: '3rem', height: '3rem', color: '#0056b3' }}>
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
+      <p style={{ marginTop: '10px', fontSize: '18px', color: '#0056b3' }}>Loading Club Schedule...</p>
+    </div>
+  );
 
   const handleEventClick = (info) => {
 
@@ -126,7 +147,7 @@ const ClubSchedule = () => {
       return { success: false, message: 'Error! Please try again later.' };
     }
   };
-  
+
   const handleAddEvent = async (newEvent) => {
 
     try {
@@ -142,14 +163,14 @@ const ClubSchedule = () => {
         console.error('Error adding event:', response.statusText);
         return { success: false, message: `Error: ${response.statusText}` };
       }
-  
+
       const result = await response.json();
-  
+
       if (result.status === "success") {
-    
+
         addEvent(newEvent); // Update the context
         setCreateEventModalOpen(false);
-  
+
         return { success: true, message: "Event added successfully" };
       } else {
         console.error("Error adding event:", result.message);
@@ -214,61 +235,51 @@ const ClubSchedule = () => {
     return status
   };
 
-  function renderEventContent(eventInfo) {
-    const textClass = screenWidth < 768 ? 'event-text-mobile' : 'event-text-desktop';
-    return (
-      <div>
-        <b className={`fc-event-time ${textClass}`}>{eventInfo.timeText}</b>
-        <div className={`fc-event-title ${textClass}`}>
-          {eventInfo.event.title}
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="app-container">
       <Header />
       <div className="home-container">
         <div className="content-container">
-          <div className="single-content-container">
+          <div className="single-content-container">          
             {isFetching ? (
-              <h2 style={{ color: 'blue', textAlign: 'center' }}>Loading Events...</h2>
-            ) : (
-              <h2>Club Schedule</h2>
+              renderLoadingIndicator()
+            ) : (              
+              <FullCalendar
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                initialView="timeGridWeek"
+                events={events.map(event => {
+                  const isFull = event.number_of_participants >= event.maxParticipants;
+                  return {
+                    id: event.eventId,
+                    title: `${event.title}`,
+                    start: event.start,
+                    end: event.end,
+                    extendedProps: {
+                      participants: event.participants
+                    },
+                    backgroundColor: isFull ? 'grey' : eventTypeColors[event.type], // Change color to grey if full
+                  }
+                })}
+                headerToolbar={{
+                  left: 'prev,next today',
+                  center: 'title',
+                  right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                }}
+                height={screenWidth < 768 ? 600 : 'auto'}
+                eventClick={handleEventClick}
+                dateClick={handleDateClick}
+                editable={true}
+                selectable={true}
+                slotMinTime="09:00:00"
+                slotMaxTime="24:00:00"
+                eventContent={renderEventContent}
+                eventOverlap={true}
+                slotEventOverlap={false}
+              />
+
             )}
-            <FullCalendar
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              initialView="timeGridWeek"
-              events={events.map(event => {
-                const isFull = event.number_of_participants >= event.maxParticipants;
-                return {
-                  id: event.eventId,
-                  title: `${event.title}`,
-                  start: event.start,
-                  end: event.end,
-                  extendedProps: {
-                    participants: event.participants
-                  },
-                  backgroundColor: isFull ? 'grey' : eventTypeColors[event.type], // Change color to grey if full
-                }
-              })}
-              headerToolbar={{
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay',
-              }}
-              height={screenWidth < 768 ? 600 : 'auto'}
-              eventClick={handleEventClick}
-              dateClick={handleDateClick}
-              editable={true}
-              selectable={true}
-              slotMinTime="09:00:00"
-              slotMaxTime="24:00:00"
-              eventContent={renderEventContent}
-              eventOverlap={true}
-              slotEventOverlap={false}
-            />
             {selectedEvent && (
               <EventRegistrationModal
                 show={modalIsOpen}
@@ -279,7 +290,7 @@ const ClubSchedule = () => {
                 handleDeleteEvent={handleDeleteEvent}
                 handleUpdateEvent={handleUpdateEvent}
                 user={user}
-                participantFrequency= {participantFrequency}
+                participantFrequency={participantFrequency}
               />
             )}
             {isCreateEventModalOpen && (
