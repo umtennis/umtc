@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.3334d620.css",
-    "main.js": "/static/js/main.3a8661e6.js",
+    "main.css": "/static/css/main.85c3f3d0.css",
+    "main.js": "/static/js/main.b2c062e9.js",
     "static/js/453.5f5be0c6.chunk.js": "/static/js/453.5f5be0c6.chunk.js",
     "static/media/home_background.jpg": "/static/media/home_background.4069eb1074f3b79e299c.jpg",
     "static/media/general_members_2023.JPG": "/static/media/general_members_2023.c2841833ec8b555aad5a.JPG",
@@ -28,12 +28,12 @@
     "static/media/UofMRecServices.png": "/static/media/UofMRecServices.30bbe7aebe04220e961d.png",
     "static/media/tennisgiant.png": "/static/media/tennisgiant.99a2575049df341aef3f.png",
     "index.html": "/index.html",
-    "main.3334d620.css.map": "/static/css/main.3334d620.css.map",
-    "main.3a8661e6.js.map": "/static/js/main.3a8661e6.js.map",
+    "main.85c3f3d0.css.map": "/static/css/main.85c3f3d0.css.map",
+    "main.b2c062e9.js.map": "/static/js/main.b2c062e9.js.map",
     "453.5f5be0c6.chunk.js.map": "/static/js/453.5f5be0c6.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.3334d620.css",
-    "static/js/main.3a8661e6.js"
+    "static/css/main.85c3f3d0.css",
+    "static/js/main.b2c062e9.js"
   ]
 }
