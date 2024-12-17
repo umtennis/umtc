@@ -115,41 +115,38 @@
   color: #555;
   margin-bottom: 20px;
 }
-
 .sponsors-logos {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-  flex-wrap: wrap;
+  display: flex; /* Use flexbox */
+  justify-content: center; /* Center logos horizontally */
+  gap: 40px; /* Space between each sponsor */
+  flex-wrap: wrap; /* Allow wrapping for smaller screens */
 }
 
 .sponsor {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  flex-direction: column; /* Stack logo and text vertically */
+  align-items: center; /* Center logo and text horizontally */
+  justify-content: flex-start; /* Align items to the top */
+  text-align: center; /* Center align text */
+  width: 150px; /* Fixed width for uniform alignment */
 }
 
 .sponsor-logo {
-  width: 150px;
-  height: auto;
-  max-height: 80px;
-  object-fit: contain;
-  transition: transform 0.3s ease;
+  width: 100%; /* Make logos responsive within their container */
+  height: 100px; /* Set a fixed height for consistent alignment */
+  object-fit: contain; /* Maintain aspect ratio without cropping */
+  margin-bottom: 10px; /* Space between the logo and text */
+}
+
+.sponsor-name {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 5px;
 }
 
 .sponsor-logo:hover {
   transform: scale(1.1);
 }
-
-.sponsor-name {
-  margin-top: 8px;
-  font-size: 14px;
-  color: #333;
-  font-weight: bold;
-}
-
 
 /* Main Sponsor */
 .main-sponsor {
@@ -179,4 +176,41 @@
   font-size: 16px;
   font-weight: bold;
   color: #555;
+}
+
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .sponsors-section h2, .socials-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .sponsors-message, .socials-message {
+    font-size: 0.9rem;
+  }
+
+  .sponsors-logos {
+    gap: 15px;
+  }
+
+  .sponsor-logo {
+    width: 80px;
+  }
+  .main-sponsor-logo{
+    width: 75%;
+  }
+
+  .socials-gallery {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+  }
+
+  .popup-content {
+    max-width: 95%;
+    max-height: 85%;
+  }
+
+  .close-button {
+    font-size: 20px;
+  }
 }

@@ -102,3 +102,11 @@
 .fc-event {
   padding: 2px 4px; /* Reduce padding to make more room */
 }
+
+@media (max-width: 768px) {
+  .single-content-container {
+    flex-direction: column;
+    height: auto; /* Allow containers to expand naturally on smaller screens */
+    width: 100%; /* Ensure the container takes full width on mobile */
+  }
+}
